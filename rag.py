@@ -32,35 +32,13 @@ try:
         chunks = filter_complex_metadata(chunks)
         return chunks
     
-
-    #chunks=generateChunks(readPdf('student-handbook-2023-2024(2).pdf'))
-    
-    #print(len(chunks))
-
-    persist_dir='VectorStore'#dir to store vectordb
-
-    embeddings= OllamaEmbeddings(model="nomic-embed-text")
-    #print("embedding model choosen")
-
-    #function to create and persist db
+     #function to create and persist db
     def createVector(documents, embeddings, persist_directory):
 
         vector_store = Chroma.from_documents(documents=documents, embedding=embeddings, persist_directory=persist_directory)
         #persiste the db to disk
         vector_store.persist()
         vector_store = None
-
-    #calling function to generate db
-    #createVector(chunks,embeddings, persist_dir)
-
-
-    # Now we can load the persisted database from disk, and use it as normal. 
-    vector_store = Chroma(persist_directory=persist_dir, 
-                   embedding_function=embeddings)
-    
-    #print( vector_store)
-
-    retriever= vector_store.as_retriever()
 
     #function to create promt template
     def promptTemplate():
@@ -72,6 +50,8 @@ try:
         """
         return template
     
+
+    #function to create retrieval chain
     def getRetrievalChain():
         prompt = ChatPromptTemplate.from_template(promptTemplate())
         model = ChatOllama(model="llama3")
@@ -83,8 +63,31 @@ try:
             | StrOutputParser()
         )
         return retrieval_chain
-    #print("retrieval chain created")
+    
 
+    #chunks=generateChunks(readPdf('student-handbook-2023-2024(2).pdf'))
+    
+    #print(len(chunks))
+
+    persist_dir='VectorStore'#dir to store vectordb
+
+    embeddings= OllamaEmbeddings(model="nomic-embed-text")
+    #print("embedding model choosen")
+
+   
+
+    #calling function to generate db
+    #createVector(chunks,embeddings, persist_dir)
+
+
+    # Now we can load the persisted database from disk, and use it as normal. 
+    vector_store = Chroma(persist_directory=persist_dir, 
+                   embedding_function=embeddings)
+    
+    #print( vector_store)
+    
+
+    retriever= vector_store.as_retriever()
     
     user_input=input("Question: ")
 
@@ -99,3 +102,5 @@ try:
 
 except Exception as e:
     print(f"An error occurred: {e}")
+
+print("hello")
